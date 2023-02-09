@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- Required Icon -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" />
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+        crossorigin="anonymous" />
+    <!-- alga js
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/alga-js@0.1.0-wood-5" /> -->
+
+    <!-- development version, includes helpful console warnings -->
+    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+
+    <title>Monitoring Kegiatan KPPN KP</title>
+
+    <style>
+        .fade-enter-active,
+        .fade-leave-active {
+            transition: opacity 0.5s;
+        }
+
+        .fade-enter,
+        .fade-leave-to {
+            opacity: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container" id="app">
+        <h1 @click="pilihSeksi('')">Monitoring Kegiatan KPPN Khusus Penerimaan</h1>
+
+
+
+
+
+
+        <!-- tampilan utama -->
+        <div class="utama">
+            <!-- <div class="row">
+                <div class="col-9">
+                    <button style="margin-right:13px;" type="button" class="btn  btn-outline-primary mt-1 position-relative" @click="pilihSeksi('UMUM'); halaman=1;">
+                        <b>UMUM </b>
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary">
+                            {{jUmum}}
+                        </span>
+                    </button>
+                    <button style="margin-right:13px;" type="button" class="btn  btn-outline-secondary mt-1 position-relative" @click="pilihSeksi('P dan KI'); halaman=1;">
+                        <b> P & KI </b>
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-secondary">
+                            {{jPnki}}
+                        </span>
+                    </button>
+                    <button style="margin-right:13px;" type="button" class="btn  btn-outline-success mt-1 position-relative" @click="pilihSeksi('VAAS'); halaman=1;">
+                        <b> VAAS </b>
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-success">
+                            {{jVaas}}
+                        </span>
+                    </button>
+                    <button style="margin-right:13px;" type="button" class="btn  btn-outline-warning mt-1 position-relative" @click="pilihSeksi('LPTI'); halaman=1;">
+                        <b> LPTI </b>
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning">
+                            {{jLpti}}
+                        </span>
+                    </button>
+                    <button style="margin-right:13px;" type="button" class="btn  btn-outline-info mt-1 position-relative" @click="pilihSeksi('REKON'); halaman=1;">
+                        <b> REKON </b>
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-info">
+                            {{jReko}}
+                        </span>
+                    </button>
+                </div>
+                <div class="col-3">
+                    <button type="button" class="btn btn-success" style="margin-left: 45%" data-bs-toggle="modal" data-bs-target="#exampleModal"
+                        data-bs-whatever="@mdo" @click="tambahFlash">
+                        <b> + </b>
+                    </button>
+                    <button @click="ambilHistory" class="btn btn-secondary" data-bs-toggle="tooltip" data-bs-placement="top" title="untuk menampilkan data selesai"
+                        v-if="Selesai">
+                        Selesai
+                    </button>
+                    <button @click="GetDataFlash" class="btn btn-primary" data-bs-toggle="tooltip" data-bs-placement="top" title="untuk menampilkan data on progress "
+                        v-else>
+                        On Progrs
+                    </button>
+                </div>
+
+                <div class="col-12 mt-2">
+                    <input type="text" class="form-control text-success" id="recipient-name" placeholder="Cari..." v-model="cari" />
+                </div>
+            </div> -->
+
+            <div class="mt-3 row">
+                <div class="col-8"></div>
+                <div class="col-4">
+                    <select v-model="bulan" class="form-select" aria-label="Default select example">
+                        <option value="" selected>semua bulan</option>
+                        <option v-for="x in dataBulan" :value="x.bulan">{{x.bulan}}</option>
+                    </select>
+
+                </div>
+            </div>
+
+            <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Input Data</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @click="tambahFlash"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form>
+                                <div class="mb-3">
+                                    <div class="input-group">
+                                        <span class="input-group-text">Seksi</span>
+                                        <select class="form-select" aria-label="Default select example" v-model="seksi">
+                                            <!-- <option value="UMUM" selected>Open this select menu</option> -->
+                                            <option value="UMUM" selected>UMUM</option>
+                                            <option value="P dan KI">P dan KI</option>
+                                            <option value="VAAS">VAAS</option>
+                                            <option value="LPTI">LPTI</option>
+                                            <option value="REKON">REKON</option>
+                                        </select>
+                                    </div>
+
+                                    <!-- <input type="text" class="form-control" id="recipient-name" placeholder="Nama Seksi" v-model="seksi"> -->
+                                </div>
+                                <div class="mb-3">
+                                    <input type="date" class="form-control" placeholder="Tanggal" v-model="tgl" />
+                                </div>
+                                <div class="mb-3">
+                                    <div class="form-text">Permasalahan</div>
+                                    <input type="text" class="form-control" placeholder="Permasalahan" v-model="permasalahan" />
+                                </div>
+                                <div class="mb-3">
+                                    <div class="form-text">Upaya</div>
+                                    <textarea class="form-control" placeholder="upaya" v-model="isu"></textarea>
+                                </div>
+                                <div class="mb-3">
+                                    <div class="form-text">Hasil</div>
+                                    <textarea class="form-control" placeholder="hasil" v-model="upaya"></textarea>
+                                </div>
+                                <div class="mb-3">
+                                    <!-- <input type="text" class="form-control" id="recipient-name" placeholder="status" v-model="statusFlash"> -->
+                                    <div class="input-group">
+                                        <span class="input-group-text">Status</span>
+                                        <select class="form-select" aria-label="Default select example" v-model="statusFlash">
+                                            <!-- <option value="UMUM" selected>Open this select menu</option> -->
+                                            <option value="On Progres">On Progres</option>
+                                            <option value="Selesai">Selesai</option>
+
+                                            <!-- <option value="VAAS">VAAS</option>
+                        <option value="LPTI">LPTI</option>
+                        <option value="REKON">REKON</option> -->
+                                        </select>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-primary" data-bs-dismiss="modal" @click="simpanFlash" v-if="!editData">
+                                Simpan
+                            </button>
+                            <button type="button" class="btn btn-primary" data-bs-dismiss="modal" @click="updateFlash" v-else>
+                                Update
+                            </button>
+                            <button type="button" class="btn btn-danger" data-bs-dismiss="modal" @click="editData = false">
+                                Batal
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mt-3">
+                <div class="col-12">
+                    <table class="table table-striped border">
+                        <thead>
+                            <tr class="" style="vertical-align: middle;">
+                                <th scope="col">#</th>
+                                <th style="width: 13%; vertical-align: middle;" scope="col">Bulan</th>
+                                <th style="width: 50%" scope="col">Nama Kegiatan</th>
+                                <th style="width: 15%" scope="col">Tanggal Pelaksanaan</th>
+                                <th scope="col">P I C</th>
+                            </tr>
+                        </thead>
+                        <tbody v-if="dataFlash.length > 0">
+                            <tr v-for="flash,index in pagi">
+                                <th scope="row">{{index+from+1}}</th>
+                                <td>{{flash.tgl}}</td>
+                                <td>{{flash.permasalahan}}</td>
+                                <td>{{flash.isu}}</td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline-primary">
+                                        {{flash.seksi}}
+                                    </button>
+                                </td>
+
+
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="row">
+                        <div class="col-1">
+                            <select class="form-select form-select-sm" v-model="perHalaman">
+                                <option v-for="x in 5" :value="x*5">{{x*5}}</option>
+                            </select>
+                        </div>
+                        <div class="col-5">
+                            from {{from+1}} to
+                            <span v-if="to <= HasilCari.length">{{to}}</span>
+                            <span v-else>{{HasilCari.length}}</span> of {{HasilCari.length}}
+                        </div>
+                        <div class="col-6 d-flex justify-content-end">
+                            <nav aria-label="Page navigation example">
+                                <ul class="pagination">
+                                    <li class="page-item" v-if="halaman != 1" @click="halaman-=1">
+                                        <span class="page-link" href="#">Previous</span>
+                                    </li>
+                                    <li class="page-item disabled" v-else>
+                                        <span class="page-link" href="#">Previous</span>
+                                    </li>
+                                    <li class="page-item" v-for="x in jumlahHalaman" @click="halaman = x">
+                                        <span class="page-link" href="#">{{x}}</span>
+                                    </li>
+                                    <li class="page-item disabled" v-if="to >= HasilCari.length">
+                                        <span class="page-link" href="#">Next</span>
+                                    </li>
+                                    <li class="page-item" v-else @click="halaman+=1">
+                                        <span class="page-link" href="#">Next</span>
+                                    </li>
+                                </ul>
+                            </nav>
+                        </div>
+                        <!-- <span v-for="x in jumlahHalaman" @click="halaman = x">{{x}}</span> -->
+
+                        <!-- {{to}} {{HasilCari.length}} -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- tampilan utama -->
+
+        <br />
+        <br />
+        <br />
+    </div>
+    <!-- Optional JavaScript; choose one of the two! -->
+
+    <!-- Option 1: Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+        crossorigin="anonymous"></script>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <script>
+        // import { $array } from "alga-js";
+
+        var app = new Vue({
+            el: "#app",
+            data() {
+                return {
+                    message: "Hello Vue!",
+                    form_input: false,
+                    tasks: [
+                        "Daftar Tukin",
+                        "LS Capacity Building",
+                        "Kuitansi Pos dan SPBU",
+                        "Persiapn GU",
+                        "Bayar Pajak",
+                    ],
+                    kegiatan: "",
+                    bulan: "",
+                    deadline: "",
+                    detail: "",
+                    pic: "62",
+                    namapic: "",
+                    task: null,
+                    tasksView: true,
+                    detailView: false,
+                    semua: false,
+                    edit1: false,
+                    urll: "",
+
+                    editData: false,
+                    dataKe: "",
+                    dataFlash: [],
+                    flash1: null,
+                    seksi: "",
+                    tgl: "",
+                    permasalahan: "",
+                    isu: "",
+                    upaya: "",
+                    statusFlash: "",
+                    cari: "",
+                    seksiDipilih: "",
+                    tambahP: false,
+                    tglProgres: "",
+                    progres: "",
+                    dataProgress: [],
+                    dataBulan: [],
+                    progress1: null,
+                    Selesai: true,
+                    halaman: 1,
+                    perHalaman: 10,
+                    datProg: {},
+                };
+            },
+            computed: {
+                dataProgSiap() {
+                    if (this.datProg.tglprogress) { return 'https://script.google.com/macros/s/AKfycbyZFjDBgwz2oE_pEwKb3dW8GQsAm1snHxYpFIQZFFVIN7Ur3y6nhQ1hDYXJWvX5xSJZNw/exec?action=insert&table=progress&data=' + aaaaaaaaaaa; }
+
+                },
+                jUmum() {
+                    const count = this.dataFlash.reduce(
+                        (acc, cur) => (cur.seksi === "UMUM" ? ++acc : acc),
+                        0
+                    );
+                    return count;
+                },
+                jPnki() {
+                    const count = this.dataFlash.reduce(
+                        (acc, cur) => (cur.seksi === "P dan KI" ? ++acc : acc),
+                        0
+                    );
+                    return count;
+                },
+                jVaas() {
+                    const count = this.dataFlash.reduce(
+                        (acc, cur) => (cur.seksi === "VAAS" ? ++acc : acc),
+                        0
+                    );
+                    return count;
+                },
+                jLpti() {
+                    const count = this.dataFlash.reduce(
+                        (acc, cur) => (cur.seksi === "LPTI" ? ++acc : acc),
+                        0
+                    );
+                    return count;
+                },
+                jReko() {
+                    const count = this.dataFlash.reduce(
+                        (acc, cur) => (cur.seksi === "REKON" ? ++acc : acc),
+                        0
+                    );
+                    return count;
+                },
+                TaskAktif: function () {
+                    let aktif = this.tasks.filter((product) => product.status != 2);
+                    let aktip = aktif.sort(function (a, b) {
+                        // Turn your strings into dates, and then subtract them
+                        // to get a value that is either negative, positive, or zero.
+                        return new Date(a.deadline) - new Date(b.deadline);
+                    });
+                    return aktip;
+                },
+                HasilCariSeksi: function () {
+                    return this.dataFlash.filter((blog) => {
+                        return blog.seksi.match(this.seksiDipilih);
+                    });
+                },
+                HasilCari: function () {
+                    return this.HasilCariSeksi.filter((blog) => {
+                        return (
+                            blog.tgl
+                                .toLowerCase()
+                                .match(this.bulan.toLowerCase())
+                            //     ||
+                            // blog.isu.toLowerCase().match(this.cari.toLowerCase()) ||
+                            // blog.upaya.toLowerCase().match(this.cari.toLowerCase()) ||
+                            // blog.tgl.toLowerCase().match(this.cari.toLowerCase())
+                        );
+                    });
+                },
+                pesanWA() {
+                    let noWA = this.task.pic;
+
+                    let keg = this.task.kegiatan.replaceAll(" ", "%20");
+                    let detailkeg = this.task.detail.replaceAll(" ", "%20");
+
+                    return `https://api.whatsapp.com/send?phone=${noWA}&text=*Kegiatan:%20${keg}*%0a%0aDetail:%20${detailkeg}`;
+                },
+                FilterProgress: function () {
+                    return this.dataProgress.filter((blog) => {
+                        return blog.idMasalah.match(this.flash1.id);
+                    });
+                },
+                pagi() {
+                    let arrayAwal = (this.halaman - 1) * this.perHalaman
+                    // let arrayAwal = (this.halaman -1) * 3
+
+                    return this.HasilCari.slice((this.halaman - 1) * this.perHalaman, (this.halaman - 1) * this.perHalaman + parseInt(this.perHalaman))
+                    // return this.HasilCari.slice(6,8) 
+                    // return this.HasilCari.slice(3,8)
+
+                },
+                from() {
+                    return (this.halaman - 1) * this.perHalaman
+                },
+                to() {
+                    return (this.halaman - 1) * this.perHalaman + parseInt(this.perHalaman)
+                },
+                jumlahHalaman() {
+                    return Math.ceil(this.HasilCari.length / this.perHalaman)
+                },
+            },
+            methods: {
+                simpanProgress() {
+                    if (this.datProg.tglprogress && this.datProg.progress) {
+
+                        // if (this.datProg.tglProgress && this.datProg.progres) {
+                        this.loading = true;
+                        var waktu1 = Date.now();
+                        var ikegiatan = this.flash1.id.toString();
+                        var ideadline = this.tglProgres.toString();
+                        var idetail = this.progres.toString();
+                        this.datProg.id = waktu1;
+                        this.datProg.idMasalah = this.flash1.id.toString();
+
+                        this.datProg.progress = encodeURIComponent(this.datProg.progress);
+                        this.datProg.log = 1;
+
+                        // var istatus = 1;
+                        var aaaaaaaaaaa = JSON.stringify(this.datProg);
+                        // console.log(aaaaaaaaaaa);
+                        var lin = `https://script.google.com/macros/s/AKfycbyZFjDBgwz2oE_pEwKb3dW8GQsAm1snHxYpFIQZFFVIN7Ur3y6nhQ1hDYXJWvX5xSJZNw/exec?action=insert&table=progress&data=${JSON.stringify(this.datProg)}`;
+
+                        // var lin = `https://script.google.com/macros/s/AKfycbyZFjDBgwz2oE_pEwKb3dW8GQsAm1snHxYpFIQZFFVIN7Ur3y6nhQ1hDYXJWvX5xSJZNw/exec?action=insert&table=progress&data={"id":${waktu1}, "idMasalah":"'${ikegiatan}","tglprogress":"'${ideadline}","progress":"'${idetail}","log":"1"}`;
+
+                        // this.test = lin;
+                        this.urll = lin;
+
+                        // fetch(lin)
+                        //   .then(() => {
+                        //     app.progres = "";
+                        //     app.datProg.progress = decodeURIComponent(app.datProg.progress);
+                        //     app.dataProgress.push(app.datProg);
+                        //   })
+
+
+                        //metode lama pake ajax
+                        $.ajax({
+                            type: "GET",
+                            url: lin,
+                            crossDomain: true,
+                            dataType: "jsonp",
+                            dataType: "text",
+                            success: function (resultData) {
+                                //   alert("Save Complete");
+                                app.progres = "";
+
+                                app.datProg.progress = decodeURIComponent(app.datProg.progress);
+                                app.dataProgress.push(app.datProg);
+
+
+                            },
+                        });
+
+
+
+                        alert("Progress Berhasil di Simpan");
+                    } else {
+                        alert("Masih terdapat data yang belum di input");
+                    }
+                },
+                klikDetail(x) {
+                    this.tambahP = true;
+                    this.flash1 = x;
+                },
+                tambahFlash() {
+                    this.editData = false;
+                    this.seksi = "";
+                    this.tgl = "";
+                    this.permasalahan = "";
+                    this.isu = "";
+                    this.upaya = "";
+                    this.statusFlash = "";
+                    this.flash1 = [];
+                },
+                pilihSeksi(x) {
+                    this.tambahP = false;
+                    this.seksiDipilih = x;
+                },
+                simpanFlash() {
+                    if (this.seksi && this.permasalahan) {
+                        this.loading = true;
+                        var waktu1 = Date.now();
+                        var ikegiatan = this.seksi.toString();
+                        var ideadline = this.tgl.toString();
+                        var idetail = this.permasalahan.toString();
+                        var ipic = this.isu.toString();
+                        var inamapic = this.upaya.toString();
+                        var istatus = this.statusFlash.toString();
+
+                        // var istatus = 1;
+                        var lin = `https://script.google.com/macros/s/AKfycbyZFjDBgwz2oE_pEwKb3dW8GQsAm1snHxYpFIQZFFVIN7Ur3y6nhQ1hDYXJWvX5xSJZNw/exec?action=insert&table=data&data={"id":${waktu1}, "seksi":"'${ikegiatan}","tgl":"'${ideadline}","permasalahan":"'${idetail}","isu":"${ipic} ","upaya":"'${inamapic}","statusFlash":"'${istatus}","log":"1"}`;
+                        this.test = lin;
+                        this.urll = lin;
+                        $.ajax({
+                            type: "GET",
+                            url: lin,
+                            crossDomain: true,
+                            dataType: "jsonp",
+                            dataType: "text",
+                            success: function (resultData) {
+                                //   alert("Save Complete");
+                                app.permasalahan = "";
+                                app.isu = "";
+                                app.upaya = "";
+                                app.statusFlash = "";
+
+                                app.dataFlash.unshift({
+                                    id: waktu1,
+                                    seksi: ikegiatan,
+                                    tgl: ideadline,
+                                    permasalahan: idetail,
+                                    isu: ipic,
+                                    upaya: inamapic,
+                                    statusFlash: istatus,
+                                });
+
+                                // app.GetDataTasks();
+                            },
+                        });
+
+                        // alert("Flash Harian Berhasil di Simpan");
+                    } else {
+                        alert("Masih terdapat data yang belum di input");
+                    }
+                },
+                hapusProgress(aa, index) {
+                    if (confirm("Anda yakin menghapus ?")) {
+                        app.dataProgress.splice(index, 1);
+                        var itimestamp = aa.id;
+
+                        var url1 = `https://script.google.com/macros/s/AKfycbyZFjDBgwz2oE_pEwKb3dW8GQsAm1snHxYpFIQZFFVIN7Ur3y6nhQ1hDYXJWvX5xSJZNw/exec?action=update&table=progress&id=${itimestamp}&data={"log":""}`;
+                        // this.test = url;
+                        // timestamp=${itimestamp}
+                        $.ajax({
+                            type: "GET",
+                            url: url1,
+                            crossDomain: true,
+                            dataType: "jsonp",
+                            dataType: "text",
+                            success: function (resultData) {
+                                // alert('Task Update Selesai')
+                                // app.GetDataTasks();
+                                // app.home();
+                                app.GetDataProgress();
+                            },
+                        });
+                    }
+                },
+                hapusFlash(aa, index) {
+                    if (confirm("Anda yakin menghapus ?")) {
+                        app.dataFlash.splice(index, 1);
+                        // alert('update')
+                        // var waktu1 = Date.now();
+                        var itimestamp = aa.id;
+                        // console.log(itimestamp)
+                        // var url = `https://script.google.com/macros/s/AKfycbyZFjDBgwz2oE_pEwKb3dW8GQsAm1snHxYpFIQZFFVIN7Ur3y6nhQ1hDYXJWvX5xSJZNw/exec?action=delete&table=data&id=${itimestamp}`
+
+                        //   $.ajax({
+                        //   type: 'GET',
+                        //   url: url,
+                        //   crossDomain: true,
+                        //   dataType: 'jsonp',
+                        //   dataType: "text",
+                        //   success: function (resultData) {
+                        //     console.log('Flash Berhasil di hapus');
+                        //     // alert('Task Berhasil di hapus')
+                        //     // app.GetDataTasks();
+                        //     // app.home();
+                        //   }
+                        // });
+
+                        var url1 = `https://script.google.com/macros/s/AKfycbyZFjDBgwz2oE_pEwKb3dW8GQsAm1snHxYpFIQZFFVIN7Ur3y6nhQ1hDYXJWvX5xSJZNw/exec?action=update&table=data&id=${itimestamp}&data={"log":""}`;
+                        this.test = url1;
+                        // timestamp=${itimestamp}
+                        $.ajax({
+                            type: "GET",
+                            url: url1,
+                            crossDomain: true,
+                            dataType: "jsonp",
+                            dataType: "text",
+                            success: function (resultData) {
+                                // alert('Task Update Selesai')
+                                // app.GetDataTasks();
+                                // app.home();
+                            },
+                        });
+
+                        // this.test = url;
+                        // timestamp=${itimestamp}
+                    }
+                },
+                editFlash(x, index) {
+                    this.dataKe = index;
+                    this.editData = true;
+                    this.flash1 = x;
+                    this.seksi = x.seksi;
+                    this.tgl = x.tgl;
+                    this.permasalahan = x.permasalahan;
+                    this.isu = x.isu;
+                    this.upaya = x.upaya;
+                    this.statusFlash = x.statusFlash;
+                },
+                editProgress1(x, index) {
+                    this.dataKe = index;
+                    this.editData = true;
+                    this.datProg = x;
+                    this.progress1 = x;
+                    this.tglProgres = x.tglprogress;
+                    this.progres = x.progress;
+                },
+                editProgress(x, index) {
+                    this.dataKe = index;
+                    this.datProg = x;
+                    this.editData = true;
+
+                },
+                updateProgress() {
+                    app.FilterProgress[this.dataKe] = datProg;
+                },
+                updateProgress1123() {
+                    this.editData = false;
+                    let dataUpdat = {
+                        id: this.progress1.id,
+                        idMasalah: this.progress1.idMasalah,
+                        tglprogress: this.tglProgres,
+                        progress: this.progres,
+                        log: "2",
+                    };
+
+                    app.FilterProgress[this.dataKe] = dataUpdat;
+
+                    // alert('update')
+                    // var waktu1 = Date.now();
+                    var waktu1 = Date.now();
+                    // var ikegiatan = this.datProg.tglProgres.toString();
+                    // var ideadline = this.datProg.progres.toString();
+                    // var idetail = this.permasalahan.toString();
+                    // var ipic = this.isu.toString();
+                    // var inamapic = this.upaya.toString();
+                    // var istatus = this.statusFlash.toString();
+                    var itimestamp = this.progress1.id.toString();
+                    // var url = `https://script.google.com/macros/s/AKfycbyZFjDBgwz2oE_pEwKb3dW8GQsAm1snHxYpFIQZFFVIN7Ur3y6nhQ1hDYXJWvX5xSJZNw/exec?action=update&table=progress&id=${itimestamp}&data={"tglprogress":"'${ikegiatan}","progress":"'${ideadline}","log":"2"}`;
+
+
+                    var url = `https://script.google.com/macros/s/AKfycbyZFjDBgwz2oE_pEwKb3dW8GQsAm1snHxYpFIQZFFVIN7Ur3y6nhQ1hDYXJWvX5xSJZNw/exec?action=update&table=progress&id=${itimestamp}&data=${JSON.stringify(dataUpdat)}`;
+
+
+                    // this.test = url;
+                    // timestamp=${itimestamp}
+                    $.ajax({
+                        type: "GET",
+                        url: url,
+                        crossDomain: true,
+                        dataType: "jsonp",
+                        dataType: "text",
+                        success: function (resultData) {
+                            // alert('Progress Update Selesai')
+                            console.log("Progress Berhasil di update");
+                            // app.GetDataProgress();
+
+
+
+                            // app.home();
+                        },
+                    });
+                },
+                updateFlash() {
+                    this.editData = false;
+                    let dataUpdat = {
+                        id: this.flash1.id,
+                        seksi: this.seksi,
+                        tgl: this.tgl,
+                        permasalahan: this.permasalahan,
+                        isu: this.isu,
+                        upaya: this.upaya,
+                        statusFlash: this.statusFlash,
+                        log: "2",
+                    };
+
+                    app.HasilCari[this.dataKe] = dataUpdat;
+
+                    // alert('update')
+                    // var waktu1 = Date.now();
+                    var waktu1 = Date.now();
+                    var ikegiatan = this.seksi.toString();
+                    var ideadline = this.tgl.toString();
+                    var idetail = this.permasalahan.toString();
+                    var ipic = this.isu.toString();
+                    var inamapic = this.upaya.toString();
+                    var istatus = this.statusFlash.toString();
+                    var itimestamp = this.flash1.id.toString();
+                    var url = `https://script.google.com/macros/s/AKfycbyZFjDBgwz2oE_pEwKb3dW8GQsAm1snHxYpFIQZFFVIN7Ur3y6nhQ1hDYXJWvX5xSJZNw/exec?action=update&table=data&id=${itimestamp}&data={"seksi":"'${ikegiatan}","tgl":"'${ideadline}","permasalahan":"'${idetail}","isu":"${ipic} ","upaya":"'${inamapic}","statusFlash":"'${istatus}","log":"2"}`;
+                    // this.test = url;
+                    // timestamp=${itimestamp}
+                    $.ajax({
+                        type: "GET",
+                        url: url,
+                        crossDomain: true,
+                        dataType: "jsonp",
+                        dataType: "text",
+                        success: function (resultData) {
+                            // alert('Task Update Selesai')
+                            console.log("Flash Berhasil di update");
+                            // app.GetDataTasks();
+                            // app.home();
+                        },
+                    });
+                },
+                home() {
+                    this.detailView = false;
+                    this.tasksView = true;
+                    this.form_input = false;
+                },
+                kliktampildetail(task) {
+                    this.task = task;
+                    this.tasksView = false;
+                    this.detailView = true;
+                },
+                simpanTask() {
+                    if (this.kegiatan) {
+                        this.loading = true;
+                        var waktu1 = Date.now();
+                        var ikegiatan = this.kegiatan.toString();
+                        var ideadline = this.deadline.toString();
+                        var idetail = this.detail.toString();
+                        var ipic = this.pic.toString();
+                        var inamapic = this.namapic.toString();
+                        var istatus = 1;
+                        var lin = `https://script.google.com/macros/s/AKfycbzfOmAEsUqWORVFgVgp3-juYufE-2xrp5hn85E2hZT0hXLw8_Ur-9sxY1eCDQLo8mJI/exec?action=insert&table=data&data={"id":${waktu1}, "kegiatan":"'${ikegiatan}","deadline":"'${ideadline}","detail":"'${idetail}","status":"${istatus} ","pic":"${ipic}","namapic":"'${inamapic}","timeupdate":"-"}`;
+                        // this.test = lin;
+                        this.urll = lin;
+                        $.ajax({
+                            type: "GET",
+                            url: lin,
+                            crossDomain: true,
+                            dataType: "jsonp",
+                            dataType: "text",
+                            success: function (resultData) {
+                                //   alert("Save Complete");
+                                app.kegiatan = "";
+                                app.deadline = "";
+                                app.detail = "";
+                                app.pic = "";
+                                app.namapic = "";
+
+                                app.GetDataTasks();
+                            },
+                        });
+
+                        alert("Task Berhasil di Simpan");
+                    } else {
+                        alert("Masih terdapat data yang belum di input");
+                    }
+                },
+                TaskSelesai(aa) {
+                    // alert('update')
+                    // var waktu1 = Date.now();
+                    var itimestamp = aa.id;
+                    var url = `https://script.google.com/macros/s/AKfycbzfOmAEsUqWORVFgVgp3-juYufE-2xrp5hn85E2hZT0hXLw8_Ur-9sxY1eCDQLo8mJI/exec?action=update&table=data&id=${itimestamp}&data={"status":"2"}`;
+                    // this.test = url;
+                    // timestamp=${itimestamp}
+                    $.ajax({
+                        type: "GET",
+                        url: url,
+                        crossDomain: true,
+                        dataType: "jsonp",
+                        dataType: "text",
+                        success: function (resultData) {
+                            alert("Task Update Selesai");
+                            app.GetDataTasks();
+                            app.home();
+                        },
+                    });
+                },
+                updateTask() {
+                    // alert('update')
+                    // var waktu1 = Date.now();
+                    var waktu1 = Date.now();
+                    var ikegiatan = this.task.kegiatan.toString();
+                    var ideadline = this.task.deadline.toString();
+                    var idetail = this.task.detail.toString();
+                    var ipic = this.task.pic.toString();
+                    var inamapic = this.task.namapic.toString();
+                    var istatus = 1;
+                    var itimestamp = this.task.id.toString();
+                    var url = `https://script.google.com/macros/s/AKfycbzfOmAEsUqWORVFgVgp3-juYufE-2xrp5hn85E2hZT0hXLw8_Ur-9sxY1eCDQLo8mJI/exec?action=update&table=data&id=${itimestamp}&data={"kegiatan":"'${ikegiatan}","deadline":"'${ideadline}","detail":"'${idetail}","pic":"'${ipic}","namapic":"'${inamapic}","status":"${istatus}","timeupdate":"${waktu1}"}`;
+                    // this.test = url;
+                    // timestamp=${itimestamp}
+                    $.ajax({
+                        type: "GET",
+                        url: url,
+                        crossDomain: true,
+                        dataType: "jsonp",
+                        dataType: "text",
+                        success: function (resultData) {
+                            alert("Task Update Selesai");
+                            app.GetDataTasks();
+                            app.home();
+                        },
+                    });
+                    this.edit1 = false;
+                },
+                updateTasknAktifkan() {
+                    // alert('update')
+                    // var waktu1 = Date.now();
+                    var waktu1 = Date.now();
+                    var ikegiatan = this.task.kegiatan.toString();
+                    var ideadline = this.task.deadline.toString();
+                    var idetail = this.task.detail.toString();
+                    var istatus = 1;
+                    var itimestamp = this.task.id.toString();
+                    var url = `https://script.google.com/macros/s/AKfycbzfOmAEsUqWORVFgVgp3-juYufE-2xrp5hn85E2hZT0hXLw8_Ur-9sxY1eCDQLo8mJI/exec?action=update&table=data&id=${itimestamp}&data={"kegiatan":"'${ikegiatan}","deadline":"'${ideadline}","detail":"'${idetail}","status":"${istatus}","timeupdate":"${waktu1}","status":1}`;
+                    // this.test = url;
+                    // timestamp=${itimestamp}
+                    $.ajax({
+                        type: "GET",
+                        url: url,
+                        crossDomain: true,
+                        dataType: "jsonp",
+                        dataType: "text",
+                        success: function (resultData) {
+                            alert("Task Update Selesai");
+                            app.GetDataTasks();
+                            app.home();
+                        },
+                    });
+                    this.edit1 = false;
+                },
+                GetDataFlash() {
+                    this.dataFlash = [];
+                    this.Selesai = true;
+
+                    // var url ="https://script.google.com/macros/s/AKfycbyc7wzSrUGxQhcBN5EfVC-rNRj3wncZJOVTWAChXtSwnrHkGjoaoI91bggme_fUOIP9/exec?action=read&table=query";
+                    var url =
+                        "https://script.google.com/macros/s/AKfycbyZFjDBgwz2oE_pEwKb3dW8GQsAm1snHxYpFIQZFFVIN7Ur3y6nhQ1hDYXJWvX5xSJZNw/exec?action=read&table=kegiatan";
+
+                    $.getJSON(url, function (json) {
+                        // console.log(json.data);
+                        app.dataFlash = json.data;
+                    });
+                },
+                ambilHistory() {
+                    this.dataFlash = [];
+                    this.Selesai = false;
+
+                    // var url ="https://script.google.com/macros/s/AKfycbyc7wzSrUGxQhcBN5EfVC-rNRj3wncZJOVTWAChXtSwnrHkGjoaoI91bggme_fUOIP9/exec?action=read&table=query";
+                    var url =
+                        "https://script.google.com/macros/s/AKfycbyZFjDBgwz2oE_pEwKb3dW8GQsAm1snHxYpFIQZFFVIN7Ur3y6nhQ1hDYXJWvX5xSJZNw/exec?action=read&table=history";
+
+                    $.getJSON(url, function (json) {
+                        // console.log(json.data);
+                        app.dataFlash = json.data;
+                    });
+                },
+                GetDataProgress() {
+                    this.dataProgress = [];
+
+                    // var url ="https://script.google.com/macros/s/AKfycbyc7wzSrUGxQhcBN5EfVC-rNRj3wncZJOVTWAChXtSwnrHkGjoaoI91bggme_fUOIP9/exec?action=read&table=query";
+                    var url =
+                        "https://script.google.com/macros/s/AKfycbyZFjDBgwz2oE_pEwKb3dW8GQsAm1snHxYpFIQZFFVIN7Ur3y6nhQ1hDYXJWvX5xSJZNw/exec?action=read&table=Qprogress";
+
+                    $.getJSON(url, function (json) {
+                        // console.log(json.data);
+                        app.dataProgress = json.data;
+                    });
+                },
+                GetBulan() {
+
+
+                    this.dataBulan = [];
+
+                    // var url ="https://script.google.com/macros/s/AKfycbyc7wzSrUGxQhcBN5EfVC-rNRj3wncZJOVTWAChXtSwnrHkGjoaoI91bggme_fUOIP9/exec?action=read&table=query";
+                    var url =
+                        "https://script.google.com/macros/s/AKfycbyZFjDBgwz2oE_pEwKb3dW8GQsAm1snHxYpFIQZFFVIN7Ur3y6nhQ1hDYXJWvX5xSJZNw/exec?action=read&table=bulan";
+
+                    $.getJSON(url, function (json) {
+                        // console.log(json.data);
+                        app.dataBulan = json.data;
+                    });
+
+
+
+
+                },
+                GetNamaBulan() {
+                    setTimeout(() => {
+                        if (this.dataBulan.length > 1) {
+                            let d = new Date();
+                            let e = d.getMonth();
+                            let f = this.dataBulan[1].bulan;
+                            // console.log(this.dataBulan);
+                            // alert(f);
+                            return this.bulan = f;
+                        }
+                        else {
+                            this.GetNamaBulan();
+                        }
+                    }, 2000);
+
+
+
+
+                },
+                tampilkanSemua() {
+                    this.semua = !this.semua;
+                },
+                warna(x) {
+                    if (x == 2) {
+                        return "display-5 text-warning";
+                    } else {
+                        return "display-5 ";
+                    }
+                },
+
+            },
+            watch: {
+                perHalaman() {
+                    //  alert('tes')
+                    this.halaman = 1
+                },
+
+            },
+            created() {
+                this.GetDataFlash();
+                this.GetBulan();
+                this.GetDataProgress();
+                this.GetNamaBulan();
+            },
+        });
+    </script>
+</body>
+
+</html>
